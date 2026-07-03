@@ -1,0 +1,568 @@
+name: Customers
+description: |-
+
+  Müşteri CRUD API endpointleri. **Tüm endpointler admin yetkisi gerektirir.**
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/customers
+    metadata:
+      custom: []
+      groupName: Customers
+      groupDescription: |-
+
+        Müşteri CRUD API endpointleri. **Tüm endpointler admin yetkisi gerektirir.**
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'List customers'
+      description: |-
+        Müşterileri sayfalı olarak listeler.
+
+        **Admin yetkisi gerekir** — Bearer token + `admin` rolü.
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters:
+      per_page:
+        custom: []
+        name: per_page
+        description: 'Sayfa başına kayıt (1-100).'
+        required: false
+        example: 15
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanQueryParameters:
+      per_page: 15
+    bodyParameters:
+      per_page:
+        custom: []
+        name: per_page
+        description: 'Must be at least 1. Must not be greater than 100.'
+        required: false
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      per_page: 1
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "message": "Müşteriler başarıyla listelendi.",
+            "data": [
+              {
+                "id": 1,
+                "full_name": "Ahmet Yılmaz",
+                "email": "ahmet@example.com",
+                "phone": "05321234567"
+              }
+            ],
+            "meta": {
+              "current_page": 1,
+              "per_page": 15,
+              "total": 1,
+              "last_page": 1
+            }
+          }
+        headers: []
+        description: success
+      -
+        custom: []
+        status: 401
+        content: |-
+          {
+            "success": false,
+            "message": "Unauthenticated."
+          }
+        headers: []
+        description: unauthenticated
+      -
+        custom: []
+        status: 403
+        content: |-
+          {
+            "success": false,
+            "message": "Bu işlem için admin yetkisi gereklidir."
+          }
+        headers: []
+        description: forbidden
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/customers
+    metadata:
+      custom: []
+      groupName: Customers
+      groupDescription: |-
+
+        Müşteri CRUD API endpointleri. **Tüm endpointler admin yetkisi gerektirir.**
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Create customer'
+      description: |-
+        Yeni müşteri oluşturur.
+
+        **Admin yetkisi gerekir** — Bearer token + `admin` rolü.
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      full_name:
+        custom: []
+        name: full_name
+        description: 'Ad soyad.'
+        required: true
+        example: 'Mehmet Kaya'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      email:
+        custom: []
+        name: email
+        description: 'Benzersiz e-posta.'
+        required: true
+        example: mehmet@example.com
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      phone:
+        custom: []
+        name: phone
+        description: 'optional Telefon numarası.'
+        required: false
+        example: '05329998877'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+    cleanBodyParameters:
+      full_name: 'Mehmet Kaya'
+      email: mehmet@example.com
+      phone: '05329998877'
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 201
+        content: |-
+          {
+            "success": true,
+            "message": "Müşteri başarıyla oluşturuldu.",
+            "data": {
+              "id": 2,
+              "full_name": "Mehmet Kaya",
+              "email": "mehmet@example.com",
+              "phone": "05329998877"
+            }
+          }
+        headers: []
+        description: success
+      -
+        custom: []
+        status: 401
+        content: |-
+          {
+            "success": false,
+            "message": "Unauthenticated."
+          }
+        headers: []
+        description: unauthenticated
+      -
+        custom: []
+        status: 403
+        content: |-
+          {
+            "success": false,
+            "message": "Bu işlem için admin yetkisi gereklidir."
+          }
+        headers: []
+        description: forbidden
+      -
+        custom: []
+        status: 422
+        content: |-
+          {
+            "message": "The email has already been taken.",
+            "errors": {
+              "email": ["The email has already been taken."]
+            }
+          }
+        headers: []
+        description: 'validation error'
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/customers/{id}'
+    metadata:
+      custom: []
+      groupName: Customers
+      groupDescription: |-
+
+        Müşteri CRUD API endpointleri. **Tüm endpointler admin yetkisi gerektirir.**
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Show customer'
+      description: |-
+        Tek bir müşterinin detayını döner.
+
+        **Admin yetkisi gerekir** — Bearer token + `admin` rolü.
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the customer.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      customer:
+        custom: []
+        name: customer
+        description: 'Müşteri ID.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+      customer: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "message": "Müşteri başarıyla getirildi.",
+            "data": {
+              "id": 1,
+              "full_name": "Ahmet Yılmaz",
+              "email": "ahmet@example.com",
+              "phone": "05321234567"
+            }
+          }
+        headers: []
+        description: success
+      -
+        custom: []
+        status: 401
+        content: |-
+          {
+            "success": false,
+            "message": "Unauthenticated."
+          }
+        headers: []
+        description: unauthenticated
+      -
+        custom: []
+        status: 403
+        content: |-
+          {
+            "success": false,
+            "message": "Bu işlem için admin yetkisi gereklidir."
+          }
+        headers: []
+        description: forbidden
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PUT
+      - PATCH
+    uri: 'api/customers/{id}'
+    metadata:
+      custom: []
+      groupName: Customers
+      groupDescription: |-
+
+        Müşteri CRUD API endpointleri. **Tüm endpointler admin yetkisi gerektirir.**
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Update customer'
+      description: |-
+        Mevcut müşteriyi günceller.
+
+        **Admin yetkisi gerekir** — Bearer token + `admin` rolü.
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the customer.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      customer:
+        custom: []
+        name: customer
+        description: 'Müşteri ID.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+      customer: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      full_name:
+        custom: []
+        name: full_name
+        description: 'optional Ad soyad.'
+        required: false
+        example: 'Ahmet Yılmaz Güncel'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      email:
+        custom: []
+        name: email
+        description: 'optional E-posta.'
+        required: false
+        example: ahmet@example.com
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      phone:
+        custom: []
+        name: phone
+        description: 'optional Telefon.'
+        required: false
+        example: '05321111111'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+    cleanBodyParameters:
+      full_name: 'Ahmet Yılmaz Güncel'
+      email: ahmet@example.com
+      phone: '05321111111'
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "message": "Müşteri başarıyla güncellendi.",
+            "data": {
+              "id": 1,
+              "full_name": "Ahmet Yılmaz Güncel",
+              "phone": "05321111111"
+            }
+          }
+        headers: []
+        description: success
+      -
+        custom: []
+        status: 401
+        content: |-
+          {
+            "success": false,
+            "message": "Unauthenticated."
+          }
+        headers: []
+        description: unauthenticated
+      -
+        custom: []
+        status: 403
+        content: |-
+          {
+            "success": false,
+            "message": "Bu işlem için admin yetkisi gereklidir."
+          }
+        headers: []
+        description: forbidden
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - DELETE
+    uri: 'api/customers/{id}'
+    metadata:
+      custom: []
+      groupName: Customers
+      groupDescription: |-
+
+        Müşteri CRUD API endpointleri. **Tüm endpointler admin yetkisi gerektirir.**
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Delete customer'
+      description: |-
+        Müşteriyi siler.
+
+        **Admin yetkisi gerekir** — Bearer token + `admin` rolü.
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the customer.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      customer:
+        custom: []
+        name: customer
+        description: 'Müşteri ID.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+      customer: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "message": "Müşteri başarıyla silindi.",
+            "data": null
+          }
+        headers: []
+        description: success
+      -
+        custom: []
+        status: 401
+        content: |-
+          {
+            "success": false,
+            "message": "Unauthenticated."
+          }
+        headers: []
+        description: unauthenticated
+      -
+        custom: []
+        status: 403
+        content: |-
+          {
+            "success": false,
+            "message": "Bu işlem için admin yetkisi gereklidir."
+          }
+        headers: []
+        description: forbidden
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null

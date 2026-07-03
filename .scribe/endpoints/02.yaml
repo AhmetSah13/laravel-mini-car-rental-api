@@ -1,0 +1,930 @@
+name: Cars
+description: |-
+
+  Araç CRUD API endpointleri. Listeleme filtreleri CarService üzerinden uygulanır.
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/cars
+    metadata:
+      custom: []
+      groupName: Cars
+      groupDescription: |-
+
+        Araç CRUD API endpointleri. Listeleme filtreleri CarService üzerinden uygulanır.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'List cars'
+      description: |-
+        Araçları filtreli ve sayfalı olarak listeler.
+
+        **Auth gerekmez** — public endpoint.
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters:
+      brand_id:
+        custom: []
+        name: brand_id
+        description: 'Marka ID ile filtrele.'
+        required: false
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      status:
+        custom: []
+        name: status
+        description: 'Araç durumu: `available`, `rented`, `maintenance`.'
+        required: false
+        example: available
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      min_price:
+        custom: []
+        name: min_price
+        description: 'Minimum günlük fiyat.'
+        required: false
+        example: 500.0
+        type: number
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      max_price:
+        custom: []
+        name: max_price
+        description: 'Maximum günlük fiyat.'
+        required: false
+        example: 1500.0
+        type: number
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      sort_by:
+        custom: []
+        name: sort_by
+        description: 'Sıralama alanı: `id`, `daily_price`, `year`, `created_at`.'
+        required: false
+        example: daily_price
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      sort_direction:
+        custom: []
+        name: sort_direction
+        description: 'Sıralama yönü: `asc` veya `desc`.'
+        required: false
+        example: asc
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      per_page:
+        custom: []
+        name: per_page
+        description: 'Sayfa başına kayıt (1-100).'
+        required: false
+        example: 15
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanQueryParameters:
+      brand_id: 1
+      status: available
+      min_price: 500.0
+      max_price: 1500.0
+      sort_by: daily_price
+      sort_direction: asc
+      per_page: 15
+    bodyParameters:
+      brand_id:
+        custom: []
+        name: brand_id
+        description: 'Must match an existing stored value.'
+        required: false
+        example: 16
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      status:
+        custom: []
+        name: status
+        description: ''
+        required: false
+        example: maintenance
+        type: string
+        enumValues:
+          - available
+          - rented
+          - maintenance
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      min_price:
+        custom: []
+        name: min_price
+        description: 'Must be at least 0.'
+        required: false
+        example: 39
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      max_price:
+        custom: []
+        name: max_price
+        description: 'Must be at least 0.'
+        required: false
+        example: 84
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      sort_by:
+        custom: []
+        name: sort_by
+        description: ''
+        required: false
+        example: year
+        type: string
+        enumValues:
+          - id
+          - daily_price
+          - year
+          - created_at
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      sort_direction:
+        custom: []
+        name: sort_direction
+        description: ''
+        required: false
+        example: asc
+        type: string
+        enumValues:
+          - asc
+          - desc
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      per_page:
+        custom: []
+        name: per_page
+        description: 'Must be at least 1. Must not be greater than 100.'
+        required: false
+        example: 16
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      brand_id: 16
+      status: maintenance
+      min_price: 39
+      max_price: 84
+      sort_by: year
+      sort_direction: asc
+      per_page: 16
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "message": "Araçlar başarıyla listelendi.",
+            "data": [
+              {
+                "id": 1,
+                "brand_id": 1,
+                "plate_number": "34ABC123",
+                "model": "Focus",
+                "year": 2022,
+                "daily_price": "800.00",
+                "status": "available",
+                "created_at": "2026-07-01T12:00:00.000000Z",
+                "updated_at": "2026-07-01T12:00:00.000000Z"
+              }
+            ],
+            "meta": {
+              "current_page": 1,
+              "per_page": 15,
+              "total": 1,
+              "last_page": 1
+            }
+          }
+        headers: []
+        description: success
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/cars/{id}'
+    metadata:
+      custom: []
+      groupName: Cars
+      groupDescription: |-
+
+        Araç CRUD API endpointleri. Listeleme filtreleri CarService üzerinden uygulanır.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Show car'
+      description: |-
+        Tek bir aracın detayını döner (marka bilgisi dahil).
+
+        **Auth gerekmez** — public endpoint.
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the car.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      car:
+        custom: []
+        name: car
+        description: 'Araç ID.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+      car: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "message": "Araç başarıyla getirildi.",
+            "data": {
+              "id": 1,
+              "brand_id": 1,
+              "plate_number": "34ABC123",
+              "model": "Focus",
+              "year": 2022,
+              "daily_price": "800.00",
+              "status": "available",
+              "brand": {
+                "id": 1,
+                "name": "Ford"
+              }
+            }
+          }
+        headers: []
+        description: success
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/cars
+    metadata:
+      custom: []
+      groupName: Cars
+      groupDescription: |-
+
+        Araç CRUD API endpointleri. Listeleme filtreleri CarService üzerinden uygulanır.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Create car'
+      description: |-
+        Yeni araç oluşturur.
+
+        **Admin yetkisi gerekir** — Bearer token + `admin` rolü.
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      brand_id:
+        custom: []
+        name: brand_id
+        description: 'Marka ID.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      plate_number:
+        custom: []
+        name: plate_number
+        description: 'Benzersiz plaka.'
+        required: true
+        example: 06NEW001
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      model:
+        custom: []
+        name: model
+        description: 'Model adı.'
+        required: true
+        example: Fiesta
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      year:
+        custom: []
+        name: year
+        description: 'Model yılı (1990-günümüz).'
+        required: true
+        example: 2023
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      daily_price:
+        custom: []
+        name: daily_price
+        description: 'Günlük kiralama fiyatı.'
+        required: true
+        example: 650.0
+        type: number
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      status:
+        custom: []
+        name: status
+        description: 'Durum: `available`, `rented`, `maintenance`.'
+        required: true
+        example: available
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      brand_id: 1
+      plate_number: 06NEW001
+      model: Fiesta
+      year: 2023
+      daily_price: 650.0
+      status: available
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 201
+        content: |-
+          {
+            "success": true,
+            "message": "Araç başarıyla oluşturuldu.",
+            "data": {
+              "id": 5,
+              "brand_id": 1,
+              "plate_number": "06NEW001",
+              "model": "Fiesta",
+              "year": 2023,
+              "daily_price": "650.00",
+              "status": "available"
+            }
+          }
+        headers: []
+        description: success
+      -
+        custom: []
+        status: 401
+        content: |-
+          {
+            "success": false,
+            "message": "Unauthenticated."
+          }
+        headers: []
+        description: unauthenticated
+      -
+        custom: []
+        status: 403
+        content: |-
+          {
+            "success": false,
+            "message": "Bu işlem için admin yetkisi gereklidir."
+          }
+        headers: []
+        description: forbidden
+      -
+        custom: []
+        status: 422
+        content: |-
+          {
+            "message": "The plate number has already been taken.",
+            "errors": {
+              "plate_number": ["The plate number has already been taken."]
+            }
+          }
+        headers: []
+        description: 'validation error'
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PUT
+    uri: 'api/cars/{id}'
+    metadata:
+      custom: []
+      groupName: Cars
+      groupDescription: |-
+
+        Araç CRUD API endpointleri. Listeleme filtreleri CarService üzerinden uygulanır.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Update car'
+      description: |-
+        Mevcut aracı günceller.
+
+        **Admin yetkisi gerekir** — Bearer token + `admin` rolü.
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the car.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      car:
+        custom: []
+        name: car
+        description: 'Araç ID.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+      car: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      brand_id:
+        custom: []
+        name: brand_id
+        description: 'optional Marka ID.'
+        required: false
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      plate_number:
+        custom: []
+        name: plate_number
+        description: 'optional Plaka.'
+        required: false
+        example: 34UPD001
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      model:
+        custom: []
+        name: model
+        description: 'optional Model.'
+        required: false
+        example: 'Focus ST'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      year:
+        custom: []
+        name: year
+        description: 'optional Model yılı.'
+        required: false
+        example: 2023
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      daily_price:
+        custom: []
+        name: daily_price
+        description: 'optional Günlük fiyat.'
+        required: false
+        example: 950.0
+        type: number
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      status:
+        custom: []
+        name: status
+        description: 'optional Durum.'
+        required: false
+        example: maintenance
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      brand_id: 1
+      plate_number: 34UPD001
+      model: 'Focus ST'
+      year: 2023
+      daily_price: 950.0
+      status: maintenance
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "message": "Araç başarıyla güncellendi.",
+            "data": {
+              "id": 1,
+              "model": "Focus ST",
+              "daily_price": "950.00"
+            }
+          }
+        headers: []
+        description: success
+      -
+        custom: []
+        status: 401
+        content: |-
+          {
+            "success": false,
+            "message": "Unauthenticated."
+          }
+        headers: []
+        description: unauthenticated
+      -
+        custom: []
+        status: 403
+        content: |-
+          {
+            "success": false,
+            "message": "Bu işlem için admin yetkisi gereklidir."
+          }
+        headers: []
+        description: forbidden
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PATCH
+    uri: 'api/cars/{car_id}'
+    metadata:
+      custom: []
+      groupName: Cars
+      groupDescription: |-
+
+        Araç CRUD API endpointleri. Listeleme filtreleri CarService üzerinden uygulanır.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Update car'
+      description: |-
+        Mevcut aracı günceller.
+
+        **Admin yetkisi gerekir** — Bearer token + `admin` rolü.
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      car_id:
+        custom: []
+        name: car_id
+        description: 'The ID of the car.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      car:
+        custom: []
+        name: car
+        description: 'Araç ID.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      car_id: 1
+      car: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      brand_id:
+        custom: []
+        name: brand_id
+        description: 'optional Marka ID.'
+        required: false
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      plate_number:
+        custom: []
+        name: plate_number
+        description: 'optional Plaka.'
+        required: false
+        example: 34UPD001
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      model:
+        custom: []
+        name: model
+        description: 'optional Model.'
+        required: false
+        example: 'Focus ST'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      year:
+        custom: []
+        name: year
+        description: 'optional Model yılı.'
+        required: false
+        example: 2023
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      daily_price:
+        custom: []
+        name: daily_price
+        description: 'optional Günlük fiyat.'
+        required: false
+        example: 950.0
+        type: number
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      status:
+        custom: []
+        name: status
+        description: 'optional Durum.'
+        required: false
+        example: maintenance
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      brand_id: 1
+      plate_number: 34UPD001
+      model: 'Focus ST'
+      year: 2023
+      daily_price: 950.0
+      status: maintenance
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "message": "Araç başarıyla güncellendi.",
+            "data": {
+              "id": 1,
+              "model": "Focus ST",
+              "daily_price": "950.00"
+            }
+          }
+        headers: []
+        description: success
+      -
+        custom: []
+        status: 401
+        content: |-
+          {
+            "success": false,
+            "message": "Unauthenticated."
+          }
+        headers: []
+        description: unauthenticated
+      -
+        custom: []
+        status: 403
+        content: |-
+          {
+            "success": false,
+            "message": "Bu işlem için admin yetkisi gereklidir."
+          }
+        headers: []
+        description: forbidden
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - DELETE
+    uri: 'api/cars/{id}'
+    metadata:
+      custom: []
+      groupName: Cars
+      groupDescription: |-
+
+        Araç CRUD API endpointleri. Listeleme filtreleri CarService üzerinden uygulanır.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Delete car'
+      description: |-
+        Aracı siler.
+
+        **Admin yetkisi gerekir** — Bearer token + `admin` rolü.
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_TOKEN}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the car.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      car:
+        custom: []
+        name: car
+        description: 'Araç ID.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+      car: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "message": "Araç başarıyla silindi.",
+            "data": null
+          }
+        headers: []
+        description: success
+      -
+        custom: []
+        status: 401
+        content: |-
+          {
+            "success": false,
+            "message": "Unauthenticated."
+          }
+        headers: []
+        description: unauthenticated
+      -
+        custom: []
+        status: 403
+        content: |-
+          {
+            "success": false,
+            "message": "Bu işlem için admin yetkisi gereklidir."
+          }
+        headers: []
+        description: forbidden
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
