@@ -2,6 +2,7 @@
 
 namespace App\Features\Rentals\Controllers;
 
+use App\Events\RentalCreated;
 use App\Features\Rentals\Requests\IndexRentalRequest;
 use App\Features\Rentals\Requests\StoreRentalRequest;
 use App\Features\Rentals\Requests\UpdateRentalRequest;
@@ -11,6 +12,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Rental;
 use App\Shared\Http\ApiResponse;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 /**
  * @group Rentals
@@ -172,6 +175,15 @@ class RentalController extends Controller
     public function store(StoreRentalRequest $request): JsonResponse
     {
         $rental = $this->rentalService->create($request->validated());
+
+        try {
+            broadcast(new RentalCreated($rental))->toOthers();
+        } catch (Throwable $e) {
+            Log::warning('RentalCreated broadcast failed', [
+                'rental_id' => $rental->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         return ApiResponse::created(
             new RentalResource($rental),

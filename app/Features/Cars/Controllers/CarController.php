@@ -2,6 +2,7 @@
 
 namespace App\Features\Cars\Controllers;
 
+use App\Events\CarCreated;
 use App\Features\Cars\Requests\IndexCarRequest;
 use App\Features\Cars\Requests\StoreCarRequest;
 use App\Features\Cars\Requests\UpdateCarRequest;
@@ -13,6 +14,7 @@ use App\Shared\Http\ApiResponse;
 use App\Shared\Logging\LogContext;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 /**
  * @group Cars
@@ -172,6 +174,16 @@ class CarController extends Controller
             'new_status' => $car->status?->value ?? $car->status,
             'action' => 'created',
         ]));
+
+        try {
+            broadcast(new CarCreated($car))->toOthers();
+        } catch (Throwable $e) {
+            // Real-time is progressive enhancement; REST must keep working.
+            Log::warning('CarCreated broadcast failed', [
+                'car_id' => $car->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         return ApiResponse::created(
             new CarResource($car),
