@@ -11,19 +11,28 @@ export function UserMenu() {
   if (!user) return null
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex min-w-0 items-center gap-2">
       <Link
         to="/profile"
-        className="hidden items-center gap-2 text-sm text-slate-700 hover:text-slate-900 sm:flex"
+        className="hidden min-w-0 items-center gap-2 rounded-md px-2 py-1.5 text-sm text-slate-700 hover:bg-slate-100 hover:text-foreground sm:flex"
       >
-        <User className="h-4 w-4" />
-        <span>
-          {user.name} <span className="text-slate-400">({user.role})</span>
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-primary">
+          <User className="h-4 w-4" aria-hidden="true" />
+        </span>
+        <span className="min-w-0">
+          <span className="block truncate font-semibold">{user.name}</span>
+          <span className="block text-xs text-muted">{user.role}</span>
         </span>
       </Link>
-      <Button variant="secondary" size="sm" onClick={() => logout.mutate()} loading={logout.isPending}>
-        <LogOut className="h-4 w-4" />
-        Çıkış
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={() => logout.mutate()}
+        loading={logout.isPending}
+      >
+        <LogOut className="h-4 w-4" aria-hidden="true" />
+        <span className="hidden sm:inline">Çıkış</span>
       </Button>
     </div>
   )

@@ -1,55 +1,23 @@
-name: Laravel CI
+name: CI
+
+# Strategy: run on PRs and non-main pushes only.
+# Main pushes are handled by publish-images.yml (tests + GHCR push),
+# so we avoid duplicating backend-test / frontend-check / docker builds on main.
 
 on:
-  push:
   pull_request:
+  push:
+    branches-ignore:
+      - main
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  tests:
-    name: Tests
+  backend-test:
+    name: Backend tests
     runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_DB: mini_car_rental_test
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: password
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd="pg_isready -U postgres -d mini_car_rental_test"
-          --health-interval=5s
-          --health-timeout=5s
-          --health-retries=10
-
-      redis:
-        image: redis:7-alpine
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd="redis-cli ping"
-          --health-interval=5s
-          --health-timeout=5s
-          --health-retries=10
-
-    env:
-      APP_ENV: testing
-      APP_DEBUG: true
-      APP_URL: http://127.0.0.1
-      DB_CONNECTION: pgsql
-      DB_HOST: 127.0.0.1
-      DB_PORT: 5432
-      DB_DATABASE: mini_car_rental_test
-      DB_USERNAME: postgres
-      DB_PASSWORD: password
-      CACHE_STORE: array
-      QUEUE_CONNECTION: sync
-      SESSION_DRIVER: array
-      REDIS_HOST: 127.0.0.1
-      REDIS_PORT: 6379
-      RATE_LIMITING_ENABLED: false
 
     steps:
       - name: Checkout
@@ -58,9 +26,8 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          # composer.lock Symfony paketleri PHP >= 8.4.1 gerektirir
-          php-version: '8.4'
-          extensions: pdo_pgsql, pgsql, mbstring, bcmath, zip, intl, redis
+          php-version: "8.4"
+          extensions: pdo_sqlite, mbstring, bcmath, zip, intl, redis
           coverage: none
 
       - name: Get Composer cache directory
@@ -76,19 +43,81 @@ jobs:
             ${{ runner.os }}-composer-
 
       - name: Install Composer dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+        run: composer install --prefer-dist --no-interaction --no-progress
 
-      - name: Copy environment file
-        run: cp .env.example .env
-
-      - name: Generate application key
-        run: php artisan key:generate
-
-      - name: Clear config cache
-        run: php artisan config:clear
-
-      - name: Run migrations with seed
-        run: php artisan migrate:fresh --seed --force
+      - name: Prepare application env
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          php artisan config:clear
 
       - name: Run tests
         run: php artisan test
+
+  frontend-check:
+    name: Frontend lint and build
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+  docker-build-check:
+    name: Production Docker build check
+    needs:
+      - backend-test
+      - frontend-check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build backend production image (no push)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.prod
+          push: false
+          tags: mini-car-rental-backend:ci
+          cache-from: type=gha,scope=backend-prod
+          cache-to: type=gha,mode=max,scope=backend-prod
+
+      - name: Build nginx production image (no push)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/nginx/Dockerfile
+          push: false
+          tags: mini-car-rental-nginx:ci
+          build-args: |
+            VITE_API_BASE_URL=/api
+            VITE_REVERB_HOST=localhost
+            VITE_REVERB_PORT=80
+            VITE_REVERB_SCHEME=http
+            VITE_REVERB_APP_KEY=ci-public-placeholder
+          cache-from: type=gha,scope=nginx-prod
+          cache-to: type=gha,mode=max,scope=nginx-prod

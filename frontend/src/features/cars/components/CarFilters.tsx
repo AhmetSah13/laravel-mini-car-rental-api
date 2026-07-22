@@ -1,8 +1,11 @@
+import { useState } from 'react'
+import { SlidersHorizontal, X } from 'lucide-react'
 import type { Brand } from '@/features/brands/types'
 import type { CarListParams } from '@/features/cars/types'
 import { Input } from '@/shared/components/Input'
 import { Select } from '@/shared/components/Select'
 import { Button } from '@/shared/components/Button'
+import { Badge } from '@/shared/components/Badge'
 import { CAR_STATUS_OPTIONS } from '@/shared/types/enums'
 
 type Props = {
@@ -13,8 +16,18 @@ type Props = {
 }
 
 export function CarFilters({ value, brands, onChange, onReset }: Props) {
-  return (
-    <div className="grid gap-3 rounded-xl border border-slate-200 bg-white p-4 md:grid-cols-3 lg:grid-cols-6">
+  const [open, setOpen] = useState(false)
+  const activeCount = [
+    value.brand_id,
+    value.status,
+    value.min_price,
+    value.max_price,
+    value.sort_by,
+    value.sort_direction && value.sort_direction !== 'asc' ? value.sort_direction : undefined,
+  ].filter(Boolean).length
+
+  const fields = (
+    <>
       <Select
         label="Marka"
         placeholder="Tümü"
@@ -72,10 +85,29 @@ export function CarFilters({ value, brands, onChange, onReset }: Props) {
           { value: 'desc', label: 'Azalan' },
         ]}
       />
-      <div className="md:col-span-3 lg:col-span-6">
-        <Button variant="secondary" size="sm" onClick={onReset}>
-          Filtreleri temizle
+    </>
+  )
+
+  return (
+    <div className="rounded-card border border-border bg-white p-4 shadow-sm">
+      <div className="flex items-center justify-between gap-3 md:hidden">
+        <div className="flex items-center gap-2">
+          <SlidersHorizontal className="h-4 w-4 text-primary" aria-hidden="true" />
+          <span className="text-sm font-semibold">Filtreler</span>
+          {activeCount ? <Badge variant="primary">{activeCount} aktif</Badge> : null}
+        </div>
+        <Button variant="outline" size="sm" onClick={() => setOpen((value) => !value)}>
+          {open ? <X className="h-4 w-4" /> : 'Aç'}
         </Button>
+      </div>
+
+      <div className={(open ? 'mt-4 grid' : 'hidden') + ' gap-3 md:mt-0 md:grid md:grid-cols-3 lg:grid-cols-6'}>
+        {fields}
+        <div className="flex items-end md:col-span-3 lg:col-span-6">
+          <Button variant="outline" size="sm" onClick={onReset}>
+            Filtreleri temizle
+          </Button>
+        </div>
       </div>
     </div>
   )

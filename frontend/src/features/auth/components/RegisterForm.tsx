@@ -1,11 +1,14 @@
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Eye, EyeOff } from 'lucide-react'
 import { Input } from '@/shared/components/Input'
 import { Button } from '@/shared/components/Button'
 import { registerSchema, type RegisterFormValues } from '@/features/auth/schemas/authSchemas'
 import { useRegister } from '@/features/auth/hooks/useAuth'
 
 export function RegisterForm() {
+  const [showPassword, setShowPassword] = useState(false)
   const {
     register,
     handleSubmit,
@@ -28,17 +31,36 @@ export function RegisterForm() {
       className="space-y-4"
       onSubmit={handleSubmit((values) => registerMutation.mutate(values))}
     >
-      <Input label="Ad" error={errors.name?.message} {...register('name')} />
-      <Input label="E-posta" type="email" error={errors.email?.message} {...register('email')} />
+      <Input label="Ad" autoComplete="name" error={errors.name?.message} {...register('name')} />
       <Input
-        label="Şifre"
-        type="password"
-        error={errors.password?.message}
-        {...register('password')}
+        label="E-posta"
+        type="email"
+        autoComplete="email"
+        error={errors.email?.message}
+        {...register('email')}
       />
+      <div className="relative">
+        <Input
+          label="Şifre"
+          type={showPassword ? 'text' : 'password'}
+          autoComplete="new-password"
+          error={errors.password?.message}
+          className="pr-11"
+          {...register('password')}
+        />
+        <button
+          type="button"
+          className="absolute right-2 top-8 rounded-md p-2 text-muted hover:bg-slate-100 hover:text-foreground"
+          onClick={() => setShowPassword((value) => !value)}
+          aria-label={showPassword ? 'Şifreyi gizle' : 'Şifreyi göster'}
+        >
+          {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+        </button>
+      </div>
       <Input
         label="Şifre tekrarı"
-        type="password"
+        type={showPassword ? 'text' : 'password'}
+        autoComplete="new-password"
         error={errors.password_confirmation?.message}
         {...register('password_confirmation')}
       />

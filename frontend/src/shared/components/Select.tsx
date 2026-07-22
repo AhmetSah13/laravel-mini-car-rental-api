@@ -6,25 +6,29 @@ type Option = { value: string | number; label: string }
 type Props = SelectHTMLAttributes<HTMLSelectElement> & {
   label?: string
   error?: string
+  hint?: string
   options: Option[]
   placeholder?: string
 }
 
-export function Select({ label, error, options, placeholder, className, id, ...props }: Props) {
+export function Select({ label, error, hint, options, placeholder, className, id, ...props }: Props) {
   const selectId = id ?? props.name
+  const errorId = error && selectId ? `${selectId}-error` : undefined
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-1.5">
       {label ? (
-        <label htmlFor={selectId} className="block text-sm font-medium text-slate-700">
+        <label htmlFor={selectId} className="block text-sm font-semibold text-slate-700">
           {label}
         </label>
       ) : null}
       <select
         id={selectId}
+        aria-invalid={Boolean(error)}
+        aria-describedby={errorId}
         className={cn(
-          'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-900 focus:ring-2',
-          error && 'border-red-500',
+          'h-10 w-full rounded-md border border-border bg-white px-3 text-sm text-foreground shadow-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500',
+          error && 'border-destructive focus:border-destructive focus:ring-destructive/15',
           className,
         )}
         {...props}
@@ -36,7 +40,12 @@ export function Select({ label, error, options, placeholder, className, id, ...p
           </option>
         ))}
       </select>
-      {error ? <p className="text-xs text-red-600">{error}</p> : null}
+      {hint && !error ? <p className="text-xs text-muted">{hint}</p> : null}
+      {error ? (
+        <p id={errorId} className="text-xs font-medium text-destructive">
+          {error}
+        </p>
+      ) : null}
     </div>
   )
 }

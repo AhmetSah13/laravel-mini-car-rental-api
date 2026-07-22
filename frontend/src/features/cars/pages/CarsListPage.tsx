@@ -8,10 +8,10 @@ import type { CarListParams } from '@/features/cars/types'
 import { CarCard } from '@/features/cars/components/CarCard'
 import { CarFilters } from '@/features/cars/components/CarFilters'
 import { PageHeader } from '@/shared/components/PageHeader'
-import { LoadingSpinner } from '@/shared/components/LoadingSpinner'
 import { ErrorAlert } from '@/shared/components/ErrorAlert'
 import { EmptyState } from '@/shared/components/EmptyState'
 import { Pagination } from '@/shared/components/Pagination'
+import { Skeleton } from '@/shared/components/Skeleton'
 import { toApiError } from '@/shared/lib/errors'
 
 const defaultFilters: CarListParams = {
@@ -40,12 +40,11 @@ export function CarsListPage() {
     toast.info('Yeni araç eklendi.')
   })
 
-
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Araçlar"
-        description="Public araç listesi — filtreleme ve sayfalama desteklenir."
+        title="Araç Kataloğu"
+        description="Müsaitlik, marka ve fiyat aralığına göre araçları filtreleyin."
       />
 
       <CarFilters
@@ -55,7 +54,24 @@ export function CarsListPage() {
         onReset={() => setFilters(defaultFilters)}
       />
 
-      {carsQuery.isLoading ? <LoadingSpinner /> : null}
+      {carsQuery.data ? (
+        <div className="flex items-center justify-between text-sm text-muted">
+          <span>{carsQuery.data.meta.total} sonuç</span>
+          <span>Sayfa {carsQuery.data.meta.current_page}</span>
+        </div>
+      ) : null}
+
+      {carsQuery.isLoading ? (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <div key={index} className="rounded-card border border-border bg-white p-4">
+              <Skeleton className="h-40" />
+              <Skeleton className="mt-4 h-5 w-2/3" />
+              <Skeleton className="mt-3 h-4 w-1/2" />
+            </div>
+          ))}
+        </div>
+      ) : null}
       {carsQuery.isError ? <ErrorAlert message={toApiError(carsQuery.error).message} /> : null}
 
       {carsQuery.data && carsQuery.data.data.length === 0 ? (

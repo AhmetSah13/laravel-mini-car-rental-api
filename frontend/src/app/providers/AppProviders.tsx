@@ -38,7 +38,16 @@ export function AppProviders({ children }: { children: ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <AuthBootstrap>
         {children}
-        <Toaster richColors position="top-right" />
+        <Toaster
+          richColors
+          position="top-right"
+          toastOptions={{
+            className: 'border border-border shadow-lg',
+            style: {
+              borderRadius: '8px',
+            },
+          }}
+        />
       </AuthBootstrap>
     </QueryClientProvider>
   )

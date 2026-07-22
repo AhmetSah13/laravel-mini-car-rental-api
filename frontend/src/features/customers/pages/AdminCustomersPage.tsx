@@ -10,11 +10,11 @@ import { PageHeader } from '@/shared/components/PageHeader'
 import { Card } from '@/shared/components/Card'
 import { Input } from '@/shared/components/Input'
 import { Button } from '@/shared/components/Button'
-import { LoadingSpinner } from '@/shared/components/LoadingSpinner'
 import { ErrorAlert } from '@/shared/components/ErrorAlert'
 import { EmptyState } from '@/shared/components/EmptyState'
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog'
 import { Pagination } from '@/shared/components/Pagination'
+import { SkeletonRows } from '@/shared/components/Skeleton'
 import { applyApiFieldErrors } from '@/shared/lib/formErrors'
 import { toApiError } from '@/shared/lib/errors'
 
@@ -78,7 +78,7 @@ export function AdminCustomersPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Admin · Müşteriler" description="Müşteri CRUD (admin only)" />
+      <PageHeader title="Admin · Müşteriler" description="Kiralama işlemlerinde kullanılan müşteri kayıtlarını yönetin." />
 
       <Card>
         <h2 className="mb-4 text-base font-semibold">
@@ -124,10 +124,10 @@ export function AdminCustomersPage() {
         </form>
       </Card>
 
-      {listQuery.isLoading ? <LoadingSpinner /> : null}
+      {listQuery.isLoading ? <SkeletonRows rows={5} /> : null}
       {listQuery.isError ? <ErrorAlert message={toApiError(listQuery.error).message} /> : null}
       {listQuery.data && listQuery.data.data.length === 0 ? (
-        <EmptyState title="Müşteri yok" />
+        <EmptyState title="Müşteri kaydı yok" description="Yeni müşteri oluşturduğunuzda burada listelenir." />
       ) : null}
 
       {listQuery.data && listQuery.data.data.length > 0 ? (

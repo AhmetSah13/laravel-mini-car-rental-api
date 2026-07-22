@@ -1,11 +1,12 @@
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { ArrowLeft, CalendarDays, Car, UserRound } from 'lucide-react'
 import { rentalsApi } from '@/features/rentals/api/rentalsApi'
 import { PageHeader } from '@/shared/components/PageHeader'
 import { Card } from '@/shared/components/Card'
 import { Button } from '@/shared/components/Button'
-import { LoadingSpinner } from '@/shared/components/LoadingSpinner'
+import { Skeleton } from '@/shared/components/Skeleton'
 import { ErrorAlert } from '@/shared/components/ErrorAlert'
 import { RentalStatusBadge } from '@/shared/components/StatusBadge'
 import { formatPrice, formatDate } from '@/shared/lib/format'
@@ -32,7 +33,14 @@ export function RentalDetailPage() {
     },
   })
 
-  if (rentalQuery.isLoading) return <LoadingSpinner />
+  if (rentalQuery.isLoading) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-10 w-64" />
+        <Skeleton className="h-72" />
+      </div>
+    )
+  }
   if (rentalQuery.isError) return <ErrorAlert message={toApiError(rentalQuery.error).message} />
   if (!rentalQuery.data) return null
 
@@ -43,58 +51,80 @@ export function RentalDetailPage() {
     <div className="space-y-6">
       <PageHeader
         title={`Kiralama #${rental.id}`}
-        description="Detay ve durum güncelleme"
-        actions={<RentalStatusBadge status={rental.status} />}
+        description="Kiralama özeti, ilgili araç ve müşteri bilgileri"
+        actions={
+          <>
+            <RentalStatusBadge status={rental.status} />
+            <Link to="/rentals">
+              <Button variant="outline">
+                <ArrowLeft className="h-4 w-4" />
+                Liste
+              </Button>
+            </Link>
+          </>
+        }
       />
 
-      <Card className="max-w-2xl space-y-4">
-        <dl className="grid gap-4 sm:grid-cols-2">
+      <Card className="bg-slate-900 text-white">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <dt className="text-xs uppercase text-slate-500">Araç</dt>
-            <dd className="font-medium">
-              {rental.car?.model ?? `#${rental.car_id}`}
-              {rental.car?.plate_number ? ` · ${rental.car.plate_number}` : ''}
-            </dd>
+            <p className="text-sm text-slate-300">Toplam tutar</p>
+            <p className="mt-1 text-4xl font-semibold">{formatPrice(rental.total_price)}</p>
           </div>
-          <div>
-            <dt className="text-xs uppercase text-slate-500">Müşteri</dt>
-            <dd className="font-medium">
-              {rental.customer?.full_name ?? `#${rental.customer_id}`}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-xs uppercase text-slate-500">Başlangıç</dt>
-            <dd className="font-medium">{formatDate(rental.start_date)}</dd>
-          </div>
-          <div>
-            <dt className="text-xs uppercase text-slate-500">Bitiş</dt>
-            <dd className="font-medium">{formatDate(rental.end_date)}</dd>
-          </div>
-          <div>
-            <dt className="text-xs uppercase text-slate-500">Toplam</dt>
-            <dd className="font-medium">{formatPrice(rental.total_price)}</dd>
-          </div>
-        </dl>
+          <p className="text-sm text-slate-300">
+            {formatDate(rental.start_date)} → {formatDate(rental.end_date)}
+          </p>
+        </div>
+      </Card>
 
-        {isActive ? (
-          <div className="flex flex-wrap gap-2 border-t pt-4">
+      <div className="grid gap-4 lg:grid-cols-3">
+        <Card>
+          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-md bg-slate-100 text-primary">
+            <Car className="h-5 w-5" />
+          </div>
+          <h2 className="font-semibold text-foreground">Araç</h2>
+          <p className="mt-2 text-sm text-muted">{rental.car?.model ?? `#${rental.car_id}`}</p>
+          {rental.car?.plate_number ? <p className="mt-1 text-sm font-semibold">{rental.car.plate_number}</p> : null}
+        </Card>
+        <Card>
+          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-md bg-slate-100 text-primary">
+            <UserRound className="h-5 w-5" />
+          </div>
+          <h2 className="font-semibold text-foreground">Müşteri</h2>
+          <p className="mt-2 text-sm text-muted">{rental.customer?.full_name ?? `#${rental.customer_id}`}</p>
+          {rental.customer?.email ? <p className="mt-1 break-all text-sm font-semibold">{rental.customer.email}</p> : null}
+        </Card>
+        <Card>
+          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-md bg-slate-100 text-primary">
+            <CalendarDays className="h-5 w-5" />
+          </div>
+          <h2 className="font-semibold text-foreground">Tarih aralığı</h2>
+          <p className="mt-2 text-sm text-muted">{formatDate(rental.start_date)}</p>
+          <p className="mt-1 text-sm font-semibold">{formatDate(rental.end_date)}</p>
+        </Card>
+      </div>
+
+      {isActive ? (
+        <Card>
+          <h2 className="font-semibold text-foreground">Durum aksiyonları</h2>
+          <p className="mt-2 text-sm text-muted">Aktif kiralamayı tamamlandı veya iptal edildi durumuna alabilirsiniz.</p>
+          <div className="mt-5 flex flex-wrap gap-2">
             <Button
-              variant="primary"
               loading={statusMutation.isPending}
               onClick={() => statusMutation.mutate(RentalStatus.COMPLETED)}
             >
               Completed yap
             </Button>
             <Button
-              variant="danger"
+              variant="destructive"
               loading={statusMutation.isPending}
               onClick={() => statusMutation.mutate(RentalStatus.CANCELLED)}
             >
               Cancelled yap
             </Button>
           </div>
-        ) : null}
-      </Card>
+        </Card>
+      ) : null}
     </div>
   )
 }

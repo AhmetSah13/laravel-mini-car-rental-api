@@ -1,0 +1,90 @@
+# -----------------------------------------------------------------------------
+# Stage 1: Composer dependencies (no-dev)
+# -----------------------------------------------------------------------------
+FROM composer:2 AS vendor
+
+WORKDIR /app
+
+COPY composer.json composer.lock ./
+
+RUN composer install \
+    --no-dev \
+    --prefer-dist \
+    --no-interaction \
+    --no-progress \
+    --optimize-autoloader \
+    --no-scripts \
+    --no-autoloader
+
+COPY . .
+
+# Scribe is require-dev; avoid package:discover / config boot failures
+RUN rm -f config/scribe.php \
+    && composer dump-autoload --optimize --no-dev --no-interaction \
+    && php artisan package:discover --ansi || true
+
+# -----------------------------------------------------------------------------
+# Stage 2: PHP-FPM runtime
+# -----------------------------------------------------------------------------
+FROM php:8.4-fpm-bookworm
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    libzip-dev \
+    libicu-dev \
+    libpq-dev \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN docker-php-ext-configure intl \
+    && docker-php-ext-install -j$(nproc) \
+        pdo_pgsql \
+        pgsql \
+        mbstring \
+        bcmath \
+        zip \
+        intl \
+        opcache \
+        pcntl
+
+RUN pecl install redis \
+    && docker-php-ext-enable redis
+
+# Production-oriented OPcache defaults
+RUN printf '%s\n' \
+    'opcache.enable=1' \
+    'opcache.memory_consumption=128' \
+    'opcache.interned_strings_buffer=16' \
+    'opcache.max_accelerated_files=10000' \
+    'opcache.validate_timestamps=0' \
+    'opcache.revalidate_freq=0' \
+    > /usr/local/etc/php/conf.d/opcache-prod.ini
+
+WORKDIR /var/www/html
+
+# Application source + vendor from build stages (.env excluded via .dockerignore)
+COPY . .
+COPY --from=vendor /app/vendor ./vendor
+
+# Scribe is require-dev; its config must not load in --no-dev images
+RUN rm -f config/scribe.php
+
+RUN mkdir -p \
+        storage/framework/cache \
+        storage/framework/sessions \
+        storage/framework/views \
+        storage/logs \
+        bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache \
+    && chmod -R ug+rwx storage bootstrap/cache
+
+COPY docker/php/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# php-fpm master starts as root and drops workers to www-data (official image default)
+EXPOSE 9000
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["php-fpm"]

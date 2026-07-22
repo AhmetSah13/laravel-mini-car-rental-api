@@ -5,6 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    image: mini-car-rental-runtime
     container_name: mini_car_rental_app
     restart: unless-stopped
     ports:
@@ -17,8 +18,40 @@ services:
       postgres:
         condition: service_healthy
       redis:
-        condition: service_started
+        condition: service_healthy
     command: php artisan serve --host=0.0.0.0 --port=8000
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://127.0.0.1:8000/up || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  reverb:
+    image: mini-car-rental-runtime
+    container_name: mini_car_rental_reverb
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    volumes:
+      - .:/var/www/html
+    env_file:
+      - .env
+    command: php artisan reverb:start
+
+  frontend:
+    image: node:22-alpine
+    container_name: mini_car_rental_frontend
+    restart: unless-stopped
+    working_dir: /app
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+    env_file:
+      - ./frontend/.env
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
 
   postgres:
     image: postgres:16
@@ -46,7 +79,13 @@ services:
       - "6380:6379"
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
 volumes:
   postgres_data:
   redis_data:
+  frontend_node_modules:

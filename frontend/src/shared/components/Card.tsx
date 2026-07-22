@@ -1,9 +1,21 @@
 import type { ReactNode } from 'react'
 import { cn } from '@/shared/lib/cn'
 
-export function Card({ children, className }: { children: ReactNode; className?: string }) {
+type Props = {
+  children: ReactNode
+  className?: string
+  padded?: boolean
+}
+
+export function Card({ children, className, padded = true }: Props) {
   return (
-    <div className={cn('rounded-xl border border-slate-200 bg-white p-5 shadow-sm', className)}>
+    <div
+      className={cn(
+        'rounded-card border border-border bg-surface shadow-sm shadow-slate-200/60',
+        padded && 'p-5',
+        className,
+      )}
+    >
       {children}
     </div>
   )
