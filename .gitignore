@@ -8,6 +8,7 @@
 .env
 .env.backup
 .env.production
+.env.deploy
 .env.local.backup
 .phpactor.json
 .phpunit.result.cache

@@ -1,0 +1,104 @@
+name: mini-car-rental-deploy
+
+# Registry-based deployment: pull pre-built images from GHCR.
+# No build: blocks — images are never built on the target host.
+
+services:
+  app:
+    image: ghcr.io/ahmetsah13/mini-car-rental-backend:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    env_file:
+      - .env.deploy
+    volumes:
+      - deploy_app_storage:/var/www/html/storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - deploy
+    healthcheck:
+      test: ["CMD-SHELL", "php-fpm -t || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  reverb:
+    image: ghcr.io/ahmetsah13/mini-car-rental-backend:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    env_file:
+      - .env.deploy
+    command: ["php", "artisan", "reverb:start"]
+    volumes:
+      - deploy_app_storage:/var/www/html/storage
+    depends_on:
+      app:
+        condition: service_healthy
+    networks:
+      - deploy
+    expose:
+      - "8081"
+    healthcheck:
+      test: ["CMD", "php", "-r", "exit(@fsockopen('127.0.0.1', 8081) ? 0 : 1);"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  nginx:
+    image: ghcr.io/ahmetsah13/mini-car-rental-nginx:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      app:
+        condition: service_healthy
+      reverb:
+        condition: service_started
+    networks:
+      - deploy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    env_file:
+      - .env.deploy
+    volumes:
+      - deploy_postgres_data:/var/lib/postgresql/data
+    networks:
+      - deploy
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - deploy_redis_data:/data
+    networks:
+      - deploy
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+networks:
+  deploy:
+    driver: bridge
+
+volumes:
+  deploy_postgres_data:
+  deploy_redis_data:
+  deploy_app_storage:
